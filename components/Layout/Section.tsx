@@ -25,13 +25,13 @@ export const Section: React.FC<SectionProps> = ({ id, className = '', children, 
         </div>
       )}
       
-      <div className="container mx-auto px-6 md:px-12 relative z-10 w-full h-full flex flex-col justify-center">
+      <div className="container mx-auto px-6 md:px-12 relative z-10 w-full h-full flex flex-col">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: false, amount: 0.3 }}
-          className="w-full"
+          className="w-full h-full flex flex-col justify-center"
         >
           {children}
         </motion.div>

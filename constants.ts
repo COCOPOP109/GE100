@@ -1,3 +1,4 @@
+
 import { NavItem, Member, NewsItem, StandardItem } from './types';
 
 export const NAV_ITEMS: NavItem[] = [
@@ -10,9 +11,9 @@ export const NAV_ITEMS: NavItem[] = [
 
 export const INITIATORS = [
   "中国电力发展促进会 (CEPPC)",
-  "中国工业节能与清洁生产协会 (CIECCPA)",
+  "中国工业节能与清洁生产协会工业碳效专委会 (CIECCPA)",
   "清华大学碳中和研究院",
-  "2060零碳企业行动倡议 (2060 ZERO CARBON)"
+  "2060零碳企业行动倡议(0CCI)"
 ];
 
 export const MEMBER_LOGOS = [
@@ -51,7 +52,7 @@ export const NEWS_DATA: NewsItem[] = [
     id: 3,
     date: "2025-11-12",
     title: "GE100共识在COP30中国角边会向全球发布",
-    image: "https://images.unsplash.com/photo-1475721027767-4d5ad6b38138?q=80&w=2070&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?q=80&w=2532&auto=format&fit=crop",
     link: "#"
   }
 ];
@@ -63,13 +64,13 @@ export const CASES = [
 ];
 
 export const SAMPLE_MEMBERS: Member[] = [
-  { name: "小米", level: "核心成员", joinYear: "2023", targetYear: "2040", industry: "科技/消费电子", location: "北京" },
-  { name: "晶澳科技", level: "核心成员", joinYear: "2023", targetYear: "2050", industry: "新能源/制造", location: "北京" },
-  { name: "德力西电气", level: "成员单位", joinYear: "2023", targetYear: "2050", industry: "电气制造", location: "温州" },
-  { name: "协鑫能科", level: "核心成员", joinYear: "2024", targetYear: "2045", industry: "清洁能源", location: "苏州" },
+  { name: "小米", level: "铂金级", joinYear: "2023", targetYear: "2040", industry: "科技/消费电子", location: "北京" },
+  { name: "晶澳科技", level: "铂金级", joinYear: "2023", targetYear: "2050", industry: "新能源/制造", location: "北京" },
+  { name: "德力西电气", level: "金牌级", joinYear: "2023", targetYear: "2050", industry: "电气制造", location: "温州" },
+  { name: "协鑫能科", level: "铂金级", joinYear: "2024", targetYear: "2045", industry: "清洁能源", location: "苏州" },
   { name: "金风慧能", level: "技术伙伴", joinYear: "2024", targetYear: "2040", industry: "风电服务", location: "北京" },
-  { name: "盒马", level: "成员单位", joinYear: "2024", targetYear: "2050", industry: "新零售", location: "上海" },
-  { name: "HRS驿舒", level: "成员单位", joinYear: "2024", targetYear: "2050", industry: "企业服务", location: "上海" },
-  { name: "COMIN中国", level: "成员单位", joinYear: "2023", targetYear: "2045", industry: "咨询服务", location: "深圳" },
-  { name: "华发集团", level: "成员单位", joinYear: "2024", targetYear: "2050", industry: "综合集团", location: "珠海" },
+  { name: "盒马", level: "金牌级", joinYear: "2024", targetYear: "2050", industry: "新零售", location: "上海" },
+  { name: "HRS驿舒", level: "金牌级", joinYear: "2024", targetYear: "2050", industry: "企业服务", location: "上海" },
+  { name: "COMIN中国", level: "金牌级", joinYear: "2023", targetYear: "2045", industry: "咨询服务", location: "深圳" },
+  { name: "华发集团", level: "金牌级", joinYear: "2024", targetYear: "2050", industry: "综合集团", location: "珠海" },
 ];

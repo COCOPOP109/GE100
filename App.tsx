@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState, useMemo } from 'react';
 import { Navbar } from './components/Layout/Navbar';
 import { Section } from './components/Layout/Section';
 import { GradientText } from './components/UI/GradientText';
@@ -22,11 +23,35 @@ import {
   Target,
   PenTool,
   Calendar,
-  Landmark
+  Landmark,
+  GraduationCap,
+  ArrowUpRight,
+  Search,
+  Filter
 } from 'lucide-react';
 import { INITIATORS, MEMBER_LOGOS, IMPACT_STATS, STANDARDS, NEWS_DATA, SAMPLE_MEMBERS, CASES } from './constants';
+import { motion } from 'framer-motion';
 
 const App: React.FC = () => {
+  // --- Members Filter State ---
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterIndustry, setFilterIndustry] = useState('All');
+  const [filterYear, setFilterYear] = useState('All');
+
+  // Derive unique options
+  const industries = useMemo(() => ['All', ...Array.from(new Set(SAMPLE_MEMBERS.map(m => m.industry)))], []);
+  const years = useMemo(() => ['All', ...Array.from(new Set(SAMPLE_MEMBERS.map(m => m.targetYear))).sort()], []);
+
+  // Filter Logic
+  const filteredMembers = useMemo(() => {
+    return SAMPLE_MEMBERS.filter(member => {
+      const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesIndustry = filterIndustry === 'All' || member.industry === filterIndustry;
+      const matchesYear = filterYear === 'All' || member.targetYear === filterYear;
+      return matchesSearch && matchesIndustry && matchesYear;
+    });
+  }, [searchTerm, filterIndustry, filterYear]);
+
   return (
     <div className="h-screen w-full bg-slate-50 text-slate-900 overflow-hidden relative font-sans selection:bg-emerald-200 selection:text-emerald-900">
       <Navbar />
@@ -51,7 +76,7 @@ const App: React.FC = () => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">行动倡议 (GE1OO)</span>
             </h1>
             <p className="text-lg md:text-xl text-slate-100 leading-relaxed max-w-3xl mx-auto font-light tracking-wide opacity-90">
-              GE1OO行动倡议于2023年6月发起，作为国内首个聚焦绿电消费的行动倡议，旨在推动可再生能源的广泛利用，助力中国碳中和目标。目前已得到数十家知名企业和权威机构的支持。
+              GE1OO行动倡议于2023年6月发起，作为国内首个聚焦绿电消费的行动倡议，旨在推动可再生能源的广泛利用，助力中国碳中和目标。目前已得到近百家知名企业和权威机构的支持。
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-10">
               <Button size="lg" className="bg-white text-emerald-900 hover:bg-emerald-50 border-0" onClick={() => document.getElementById('join')?.scrollIntoView({behavior: 'smooth'})}>
@@ -65,12 +90,12 @@ const App: React.FC = () => {
         </Section>
 
         {/* --- Screen 2: Partners & Members --- */}
-        <Section id="home-partners" className="bg-white">
-          <div className="max-w-7xl mx-auto w-full px-6 flex flex-col justify-center h-full py-12">
+        <Section id="home-partners" className="bg-white bg-pattern-waves">
+          <div className="max-w-7xl mx-auto w-full px-6 flex flex-col justify-center h-full">
             
             {/* Header */}
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
+            <div className="text-center mb-8">
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
                 共建<GradientText>绿色生态</GradientText>
               </h2>
               <p className="text-lg text-slate-500 max-w-3xl mx-auto leading-relaxed">
@@ -79,39 +104,73 @@ const App: React.FC = () => {
             </div>
 
             {/* Initiators */}
-            <div className="mb-20">
-              <div className="text-center mb-8">
-                <span className="text-xs font-medium text-slate-400 uppercase tracking-widest">联合发起单位</span>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {INITIATORS.map((name, i) => (
-                  <div key={i} className="group relative bg-slate-50/80 rounded-2xl p-6 flex flex-col items-center justify-center text-center hover:bg-white hover:shadow-xl hover:shadow-emerald-900/5 hover:-translate-y-1 transition-all duration-300 border border-slate-100 hover:border-emerald-100 h-64">
-                     <div className="w-16 h-16 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 mb-6 group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500 transition-all duration-500 shadow-sm">
-                       <Landmark className="w-8 h-8" strokeWidth={1.5} /> 
+            <div className="mb-8">
+               <div className="flex items-center justify-center gap-4 mb-4">
+                 <div className="h-px w-8 bg-slate-200"></div>
+                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">联合发起单位</span>
+                 <div className="h-px w-8 bg-slate-200"></div>
+               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4">
+                 {[
+                    { name: "中国电力发展促进会", en: "CEPPC", icon: Zap },
+                    { name: "中国工业节能与清洁生产协会", en: "CIECCPA", icon: Factory },
+                    { name: "清华大学碳中和研究院", en: "", icon: Landmark },
+                    { name: "2060零碳企业行动倡议", en: "0CCI", icon: Target }
+                 ].map((item, index) => (
+                     <div key={index} className="group relative bg-white rounded-xl p-5 border border-slate-100 shadow-sm hover:shadow-[0_15px_30px_-10px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-500 flex flex-col items-center text-center overflow-hidden">
+                         
+                         {/* Decorative Top Line */}
+                         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"></div>
+                         
+                         {/* Icon Container with Layered Effect */}
+                         <div className="relative mb-4">
+                             {/* Glow effect behind icon */}
+                             <div className="absolute inset-0 bg-emerald-400/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                             
+                             <div className="relative w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-50/20 border border-slate-100 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] flex items-center justify-center group-hover:scale-105 transition-transform duration-500 group-hover:border-emerald-100 group-hover:shadow-md">
+                                <item.icon 
+                                  className="w-7 h-7 text-emerald-600 fill-emerald-600/20 group-hover:scale-110 transition-all duration-500" 
+                                  strokeWidth={1.5}
+                                />
+                             </div>
+                         </div>
+
+                         {/* Text */}
+                         <h4 className="font-bold text-slate-800 text-sm leading-snug mb-2 group-hover:text-slate-900 transition-colors min-h-[2.5rem] flex items-center justify-center">
+                            {item.name.includes('清洁生产协会') ? <>中国工业节能与<br/>清洁生产协会</> : item.name.includes('清华') ? <>清华大学<br/>碳中和研究院</> : item.name.includes('2060') ? <>2060零碳企业<br/>行动倡议</> : item.name}
+                         </h4>
+                         
+                         {/* Badge */}
+                         {item.en && (
+                             <span className="inline-block px-2 py-0.5 rounded text-[9px] font-bold tracking-wider text-slate-400 bg-slate-50 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors border border-slate-100 group-hover:border-emerald-100">
+                                {item.en}
+                             </span>
+                         )}
                      </div>
-                     <h3 className="font-bold text-slate-800 text-sm leading-relaxed group-hover:text-emerald-900 transition-colors">
-                       {name}
-                     </h3>
-                  </div>
-                ))}
+                 ))}
               </div>
             </div>
 
-            {/* Members */}
+            {/* Members - Moved Up */}
             <div>
-               <div className="text-center mb-10">
-                <span className="text-xs font-medium text-slate-400 uppercase tracking-widest">成员企业</span>
-              </div>
+               <div className="flex items-center justify-center gap-4 mb-3">
+                 <div className="h-px w-8 bg-slate-200"></div>
+                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">成员单位</span>
+                 <div className="h-px w-8 bg-slate-200"></div>
+               </div>
                <div className="w-full relative">
-                  <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
-                  <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+                  <div className="absolute left-0 top-0 bottom-0 w-40 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+                  <div className="absolute right-0 top-0 bottom-0 w-40 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
                   
-                  <div className="overflow-hidden flex">
-                    <div className="flex gap-20 whitespace-nowrap animate-marquee py-4">
+                  <div className="overflow-hidden flex py-2">
+                    <div className="flex gap-20 whitespace-nowrap animate-marquee">
                       {[...MEMBER_LOGOS, ...MEMBER_LOGOS, ...MEMBER_LOGOS].map((logo, i) => (
-                        <span key={i} className="text-2xl font-bold text-slate-300 hover:text-emerald-600 transition-colors cursor-default select-none">
-                          {logo}
-                        </span>
+                        <div key={i} className="flex items-center justify-center grayscale hover:grayscale-0 opacity-40 hover:opacity-100 transition-all duration-300 cursor-default">
+                          <span className="text-xl font-bold text-slate-800">
+                            {logo}
+                          </span>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -121,74 +180,168 @@ const App: React.FC = () => {
           </div>
         </Section>
 
-        {/* --- Screen 3: Impact --- */}
-        <Section id="home-impact" className="bg-slate-50">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center max-w-7xl mx-auto h-full w-full py-12">
+        {/* --- Screen 3: Impact & Core Values --- */}
+        <Section id="home-impact" className="bg-[#F8FAFC] overflow-hidden relative">
+          
+          {/* Background: Animated Water Ripple (No Dot) */}
+          <div className="absolute inset-0 w-full h-full pointer-events-none select-none z-0 overflow-hidden">
+             
+             {/* Base gradient */}
+             <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-white/50"></div>
+             
+             {/* The "Source" Point (Bottom Left) - Dot removed, just the origin for ripples */}
+             <div className="absolute bottom-[5%] left-[5%] flex items-center justify-center">
+                 
+                 {/* Expanding Ripples - Using Framer Motion for endless loop */}
+                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    {[0, 1, 2, 3, 4].map((i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-emerald-500/20 bg-emerald-500/5 shadow-[0_0_40px_rgba(16,185,129,0.05)]"
+                        initial={{ width: 0, height: 0, opacity: 0.8 }}
+                        animate={{ width: '220vmax', height: '220vmax', opacity: 0 }}
+                        transition={{ 
+                          duration: 8, 
+                          repeat: Infinity, 
+                          delay: i * 2, 
+                          ease: "linear"
+                        }}
+                      />
+                    ))}
+                 </div>
+             </div>
+
+             {/* Soft overlay to blend */}
+             <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-gradient-to-b from-emerald-50/30 to-transparent blur-3xl rounded-full opacity-60 pointer-events-none"></div>
+          </div>
+
+          <div className="max-w-7xl mx-auto px-6 h-full flex flex-col justify-center relative z-10 py-12">
             
-            {/* Left Col: Stats & Links */}
-            <div className="lg:col-span-4 flex flex-col justify-center space-y-8">
-              <div className="space-y-4">
-                <h2 className="text-4xl md:text-5xl font-bold leading-tight">
-                  影响力与<br/><GradientText>核心价值</GradientText>
-                </h2>
-                <p className="text-slate-500">连接政策、技术与市场，构建绿电消费生态。</p>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                 {IMPACT_STATS.map((stat, i) => (
-                  <div key={i} className="p-5 rounded-2xl bg-white border border-slate-100 hover:bg-emerald-50/50 transition-colors shadow-sm">
-                    <div className="text-3xl font-bold text-emerald-600">{stat.value}</div>
-                    <div className="text-xs text-slate-500 mt-1 uppercase tracking-wide font-medium">{stat.label}</div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-20 items-center">
+               
+               {/* Left Column: Title & Staggered Stats */}
+               <div className="lg:col-span-5 flex flex-col h-full self-center">
+                  <div className="mb-12">
+                     <div className="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full mb-4 border border-emerald-100">IMPACT & VALUES</div>
+                     <h2 className="text-4xl md:text-5xl font-bold text-slate-900 leading-[1.1] mb-6 tracking-tight">
+                       影响力与<br/>
+                       <GradientText>核心价值</GradientText>
+                     </h2>
+                     <p className="text-slate-500 text-lg font-light leading-relaxed max-w-sm">
+                        连接政策、技术与市场，<br/>构建绿电消费生态闭环。
+                     </p>
                   </div>
-                ))}
-              </div>
 
-              <div className="flex flex-col space-y-3 pt-4">
-                 {['成员单位', '资源中心', '加入GE1OO'].map((link, i) => (
-                   <button key={i} onClick={() => document.getElementById(link === '加入GE1OO' ? 'join' : link === '资源中心' ? 'resources' : 'members')?.scrollIntoView({behavior:'smooth'})} 
-                      className="flex items-center justify-between p-4 bg-white rounded-xl hover:bg-slate-50 transition-colors group border border-transparent hover:border-slate-200 shadow-sm">
-                      <span className="font-semibold text-slate-700">{link}</span>
-                      <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
-                   </button>
-                 ))}
-              </div>
-            </div>
+                  {/* Redesigned Stats: Staggered Floating Cards */}
+                  <div className="grid grid-cols-2 gap-6 relative">
+                      {/* Decorative connecting line */}
+                      <div className="absolute top-10 bottom-10 left-1/2 w-px bg-slate-200 -translate-x-1/2 hidden md:block"></div>
 
-            {/* Right Col: Feature Blocks */}
-            <div className="lg:col-span-8 grid grid-cols-1 gap-6 h-full content-center">
-               {/* Block A: Standards */}
-               <div className="bg-gradient-to-br from-white to-slate-50 p-8 rounded-[2rem] border border-slate-200 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row gap-6 items-start">
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
-                     <Award className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-3 text-slate-900">深度参与标准共建，赋能净零转型实践</h3>
-                    <p className="text-slate-600 text-sm leading-relaxed mb-4">
-                      GE1OO主导编制了多个对齐国际绿电规范和中国本土行业经验的团体标准。加入GE1OO的单位有机会优先推荐技术骨干参与标准编制，直接影响供应链绿电准入规则。
-                    </p>
-                    <ul className="text-xs text-slate-500 space-y-1">
-                      <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-emerald-500"/> 提升企业技术公信力</li>
-                      <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-emerald-500"/> 衔接国际认证与标准，规避贸易壁垒</li>
-                    </ul>
+                      <div className="space-y-6">
+                         {/* Stat 1 */}
+                         <div className="p-6 bg-white rounded-2xl rounded-tr-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.04)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300 group">
+                            <div className="flex justify-between items-start mb-2">
+                               <Users className="w-5 h-5 text-emerald-100 group-hover:text-emerald-500 transition-colors" />
+                               <ArrowUpRight className="w-4 h-4 text-slate-300" />
+                            </div>
+                            <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-emerald-600 to-teal-600 mb-1">30<span className="text-emerald-500 text-2xl align-top">+</span></div>
+                            <div className="text-sm text-slate-500 font-medium">零碳联盟专家</div>
+                         </div>
+                         {/* Stat 3 */}
+                         <div className="p-6 bg-white rounded-2xl rounded-bl-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.04)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300 group">
+                             <div className="flex justify-between items-start mb-2">
+                               <Building2 className="w-5 h-5 text-emerald-100 group-hover:text-emerald-500 transition-colors" />
+                               <ArrowUpRight className="w-4 h-4 text-slate-300" />
+                            </div>
+                            <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-emerald-600 to-teal-600 mb-1">10<span className="text-emerald-500 text-2xl align-top">+</span></div>
+                            <div className="text-sm text-slate-500 font-medium">早期成员单位</div>
+                         </div>
+                      </div>
+
+                      <div className="space-y-6 md:pt-12">
+                         {/* Stat 2 */}
+                         <div className="p-6 bg-white rounded-2xl rounded-tl-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.04)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300 group">
+                             <div className="flex justify-between items-start mb-2">
+                               <FileText className="w-5 h-5 text-emerald-100 group-hover:text-emerald-500 transition-colors" />
+                               <ArrowUpRight className="w-4 h-4 text-slate-300" />
+                            </div>
+                            <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-emerald-600 to-teal-600 mb-1">50<span className="text-emerald-500 text-2xl align-top">+</span></div>
+                            <div className="text-sm text-slate-500 font-medium">标准参编单位</div>
+                         </div>
+                         {/* Stat 4 */}
+                         <div className="p-6 bg-white rounded-2xl rounded-br-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.04)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300 group">
+                             <div className="flex justify-between items-start mb-2">
+                               <Users className="w-5 h-5 text-emerald-100 group-hover:text-emerald-500 transition-colors" />
+                               <ArrowUpRight className="w-4 h-4 text-slate-300" />
+                            </div>
+                            <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-emerald-600 to-teal-600 mb-1">200<span className="text-emerald-500 text-2xl align-top">+</span></div>
+                            <div className="text-sm text-slate-500 font-medium">机构参与研讨会</div>
+                         </div>
+                      </div>
                   </div>
                </div>
 
-               {/* Block B: Leadership */}
-               <div className="bg-slate-900 text-white p-8 rounded-[2rem] shadow-xl border border-slate-800 flex flex-col md:flex-row gap-6 items-start relative overflow-hidden">
-                  <div className="absolute -right-10 -top-10 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full"></div>
-                  <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-emerald-400 shrink-0 border border-white/10">
-                     <Globe className="w-8 h-8" />
+               {/* Right Column: Content Cards - Floating & Elegant */}
+               <div className="lg:col-span-7 flex flex-col gap-8">
+                  
+                  {/* Card 1: Standards - Elegant White */}
+                  <div className="group relative bg-white/90 backdrop-blur-sm rounded-[2.5rem] p-10 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-10px_rgba(16,185,129,0.1)] transition-all duration-500 overflow-hidden">
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50/50 rounded-bl-[100px] transition-transform duration-500 group-hover:scale-110 origin-top-right"></div>
+                     <div className="relative z-10">
+                         <div className="flex items-center gap-4 mb-6">
+                            <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                                <Award className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-slate-900">深度参与标准共建</h3>
+                         </div>
+                         <p className="text-slate-600 leading-relaxed mb-8 pl-1">
+                             GE1OO主导编制了多个对齐国际绿电规范和中国本土行业经验的团体标准。加入GE1OO的单位有机会优先推荐技术骨干参与标准编制。
+                         </p>
+                         <div className="bg-slate-50/80 rounded-2xl p-6 border border-slate-100 space-y-3">
+                            <div className="flex items-start gap-3">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
+                                <span className="text-slate-700 font-medium text-sm">提升企业技术公信力，确立行业地位</span>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
+                                <span className="text-slate-700 font-medium text-sm">衔接国际认证与标准，规避贸易壁垒</span>
+                            </div>
+                         </div>
+                     </div>
                   </div>
-                  <div className="relative z-10">
-                    <h3 className="text-xl font-bold mb-3 text-white">参与专业研讨会，强化行业领导力</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                      GE1OO定期举办行业研讨会及重磅峰会论坛。加入GE1OO的单位可发布绿电转型成果、行业白皮书、创新产品，抢占市场差异化优势。
-                    </p>
-                    <div className="bg-white/5 rounded-xl p-4 border border-white/10 mt-2">
-                       <span className="text-xs font-bold text-emerald-400 uppercase mb-1 block">奖项推荐</span>
-                       <p className="text-xs text-slate-300">成员单位项目可优先推荐参评“碳生产力”优秀案例评选，收录《优秀项目案例集》并获专题报道。</p>
-                    </div>
+
+                  {/* Card 2: Seminars - Subtle Gradient */}
+                  <div className="group relative bg-gradient-to-br from-white to-slate-50/80 backdrop-blur-sm rounded-[2.5rem] p-10 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-10px_rgba(16,185,129,0.1)] transition-all duration-500">
+                     <div className="relative z-10">
+                         <div className="flex items-center gap-4 mb-6">
+                            <div className="w-12 h-12 rounded-2xl bg-slate-800 text-emerald-400 flex items-center justify-center shrink-0">
+                                <Globe className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-slate-900">强化行业领导力</h3>
+                         </div>
+                         <p className="text-slate-600 leading-relaxed mb-8 pl-1">
+                            通过定期举办的行业研讨会及重磅峰会论坛，发布绿电转型成果、行业白皮书及创新产品，抢占市场差异化优势。
+                         </p>
+                         
+                         {/* Inner Special Box */}
+                         <div className="relative overflow-hidden rounded-2xl border border-emerald-100 bg-white p-1">
+                             <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500"></div>
+                             <div className="flex items-center gap-5 p-5">
+                                 <div className="shrink-0 flex flex-col items-center justify-center w-16 h-16 rounded-xl bg-emerald-50 text-emerald-700">
+                                     <Award className="w-6 h-6 mb-1" />
+                                     <span className="text-[10px] font-bold uppercase">Award</span>
+                                 </div>
+                                 <div>
+                                     <div className="text-xs font-bold text-emerald-600 mb-1 uppercase tracking-wider">重点推荐</div>
+                                     <p className="text-sm font-medium text-slate-800 leading-snug">
+                                         成员项目可优先参评“碳生产力”优秀案例，并收录《优秀项目案例集》。
+                                     </p>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
                   </div>
+
                </div>
             </div>
           </div>
@@ -199,7 +352,7 @@ const App: React.FC = () => {
            ================================================================= */}
 
         {/* --- Screen 4: Goals --- */}
-        <Section id="about" className="bg-white">
+        <Section id="about" className="bg-white bg-pattern-waves">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center max-w-7xl mx-auto w-full">
              <div className="relative h-full flex flex-col justify-center">
                 <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl aspect-[4/3] group">
@@ -249,7 +402,7 @@ const App: React.FC = () => {
         </Section>
 
         {/* --- Screen 5: Framework --- */}
-        <Section id="about-framework" className="bg-slate-50">
+        <Section id="about-framework" className="bg-slate-50 bg-pattern-grid">
           <div className="max-w-7xl mx-auto w-full text-center space-y-16">
              <div className="max-w-3xl mx-auto">
                <h2 className="text-4xl font-bold mb-6">
@@ -296,7 +449,7 @@ const App: React.FC = () => {
         </Section>
 
         {/* --- Screen 6: 2025 Consensus --- */}
-        <Section id="about-consensus" className="bg-white">
+        <Section id="about-consensus" className="bg-white bg-pattern-waves">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-7xl mx-auto w-full">
             <div className="space-y-8 pr-0 md:pr-10">
                <div className="inline-block px-4 py-1 rounded-full bg-emerald-50 text-emerald-700 text-sm font-bold border border-emerald-100">里程碑事件</div>
@@ -345,7 +498,7 @@ const App: React.FC = () => {
            ================================================================= */}
 
         {/* --- Screen 7: Process & Docs --- */}
-        <Section id="join" className="bg-white">
+        <Section id="join" className="bg-white bg-pattern-waves">
            <div className="max-w-7xl mx-auto w-full flex flex-col justify-center h-full items-center">
               
               {/* Header */}
@@ -419,7 +572,7 @@ const App: React.FC = () => {
         </Section>
 
         {/* --- Screen 8: Contact Form --- */}
-        <Section id="join-form" className="bg-slate-50">
+        <Section id="join-form" className="bg-slate-50 bg-pattern-grid">
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 max-w-7xl mx-auto w-full items-center">
               <div className="lg:col-span-5 space-y-8">
                  <h2 className="text-4xl font-bold">
@@ -481,7 +634,7 @@ const App: React.FC = () => {
            ================================================================= */}
 
         {/* --- Screen 9: Standards & Cases --- */}
-        <Section id="resources" className="bg-white">
+        <Section id="resources" className="bg-white bg-pattern-waves">
            <div className="max-w-7xl mx-auto w-full h-full flex flex-col justify-center gap-10">
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                  <div>
@@ -526,7 +679,7 @@ const App: React.FC = () => {
         </Section>
 
         {/* --- Screen 10: Event Submission --- */}
-        <Section id="resources-events" className="bg-slate-50">
+        <Section id="resources-events" className="bg-slate-50 bg-pattern-grid">
            <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               
               {/* Left Column: Event Preview */}
@@ -560,21 +713,21 @@ const App: React.FC = () => {
                  
                  <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
                     <div className="space-y-2">
-                       <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Enterprise Name</label>
+                       <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">企业名称</label>
                        <input type="text" className="w-full h-12 px-4 rounded-lg bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all" />
                     </div>
 
                     <div className="space-y-2">
-                       <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Contact Email</label>
+                       <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">联系邮箱</label>
                        <input type="email" className="w-full h-12 px-4 rounded-lg bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all" />
                     </div>
 
                     <div className="space-y-2">
-                       <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Brief Description</label>
+                       <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">案例简介</label>
                        <textarea className="w-full h-32 p-4 rounded-lg bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all resize-none"></textarea>
                     </div>
 
-                    <button className="w-full py-4 bg-slate-900 text-white rounded-lg font-bold hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 mt-4 shadow-lg">
+                    <button className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-lg font-bold hover:shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 mt-4">
                        提交申报 <ChevronRight className="w-4 h-4" />
                     </button>
                  </form>
@@ -584,7 +737,7 @@ const App: React.FC = () => {
         </Section>
 
         {/* --- Screen 11: News --- */}
-        <Section id="news" className="bg-white">
+        <Section id="news" className="bg-white bg-pattern-waves">
           <div className="max-w-7xl mx-auto w-full">
              <div className="flex items-end justify-between mb-12 border-b border-slate-100 pb-6">
                <h2 className="text-4xl font-bold">
@@ -621,21 +774,79 @@ const App: React.FC = () => {
            ================================================================= */}
         
         {/* --- Screen 12: Members Database --- */}
-        <Section id="members" className="bg-slate-50">
-          <div className="max-w-7xl mx-auto w-full h-full flex flex-col py-10">
-            <div className="mb-8 flex items-end justify-between">
+        <Section id="members" className="bg-slate-50 bg-pattern-grid">
+          <div className="max-w-7xl mx-auto w-full h-full flex flex-col pt-36 pb-10">
+            {/* Header */}
+            <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div>
                 <h2 className="text-4xl font-bold">
-                  成员单位<GradientText>数据库</GradientText>
+                  成员<GradientText>单位</GradientText>
                 </h2>
-                <p className="text-slate-500 mt-2 text-lg">汇聚行业领袖，共创零碳未来</p>
+                <p className="text-slate-500 mt-2 text-lg">汇聚行业领袖，共创可持续未来</p>
               </div>
-              <div className="bg-white px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 shadow-sm flex items-center gap-2">
+              <div className="bg-white px-5 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 shadow-sm flex items-center gap-3">
                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                 共 {SAMPLE_MEMBERS.length} 家成员单位
+                 <span className="font-bold text-slate-800 text-lg leading-none">{filteredMembers.length}</span>
+                 <span>家成员单位</span>
               </div>
             </div>
+
+            {/* Search Bar */}
+            <div className="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row gap-2">
+               {/* Search Input */}
+               <div className="flex-1 relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors">
+                    <Search className="w-5 h-5" />
+                  </div>
+                  <input 
+                    type="text" 
+                    placeholder="搜索企业名称..." 
+                    className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-400 font-medium"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+               </div>
+               
+               {/* Industry Select */}
+               <div className="w-full md:w-56 relative group">
+                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors pointer-events-none">
+                     <Factory className="w-4 h-4" />
+                   </div>
+                   <select 
+                     className="w-full pl-11 pr-8 py-3 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none cursor-pointer font-medium text-slate-700"
+                     value={filterIndustry}
+                     onChange={(e) => setFilterIndustry(e.target.value)}
+                   >
+                      {industries.map(ind => (
+                        <option key={ind} value={ind}>{ind === 'All' ? '所有行业' : ind}</option>
+                      ))}
+                   </select>
+                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                      <ChevronRight className="w-4 h-4 rotate-90" />
+                   </div>
+               </div>
+
+               {/* Year Select */}
+               <div className="w-full md:w-48 relative group">
+                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors pointer-events-none">
+                     <Target className="w-4 h-4" />
+                   </div>
+                   <select 
+                     className="w-full pl-11 pr-8 py-3 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none cursor-pointer font-medium text-slate-700"
+                     value={filterYear}
+                     onChange={(e) => setFilterYear(e.target.value)}
+                   >
+                      {years.map(yr => (
+                        <option key={yr} value={yr}>{yr === 'All' ? '目标年份' : yr}</option>
+                      ))}
+                   </select>
+                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                      <ChevronRight className="w-4 h-4 rotate-90" />
+                   </div>
+               </div>
+            </div>
             
+            {/* Table */}
             <div className="flex-1 overflow-auto bg-white rounded-[2rem] border border-slate-200 shadow-2xl custom-scrollbar relative">
               <table className="w-full text-left border-collapse">
                 <thead className="bg-slate-50/80 backdrop-blur-md sticky top-0 z-10 border-b border-slate-200">
@@ -648,36 +859,47 @@ const App: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {SAMPLE_MEMBERS.map((m, i) => (
-                    <tr key={i} className="group hover:bg-emerald-50/30 transition-colors cursor-pointer">
-                      <td className="p-6 pl-8">
-                         <div className="font-bold text-slate-900 text-lg group-hover:text-emerald-700 transition-colors">{m.name}</div>
-                         <div className="md:hidden text-xs text-slate-500 mt-1 flex items-center gap-1"><Factory className="w-3 h-3"/> {m.industry}</div>
-                      </td>
-                      <td className="p-6">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${
-                          m.level.includes('核心') || m.level.includes('发起') 
-                            ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
-                            : 'bg-slate-100 text-slate-600 border-slate-200'
-                        }`}>
-                          {m.level}
-                        </span>
-                      </td>
-                      <td className="p-6 text-slate-600 hidden md:table-cell font-medium">
-                         <div className="flex items-center gap-2">
-                            {m.industry.includes('制造') || m.industry.includes('能源') ? <Factory className="w-4 h-4 opacity-40"/> : <Building2 className="w-4 h-4 opacity-40"/>}
-                            {m.industry}
-                         </div>
-                      </td>
-                      <td className="p-6 text-slate-600 hidden md:table-cell">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 opacity-40" />
-                          {m.location}
+                  {filteredMembers.length > 0 ? (
+                    filteredMembers.map((m, i) => (
+                      <tr key={i} className="group hover:bg-emerald-50/30 transition-colors cursor-pointer">
+                        <td className="p-6 pl-8">
+                           <div className="font-bold text-slate-900 text-lg group-hover:text-emerald-700 transition-colors">{m.name}</div>
+                           <div className="md:hidden text-xs text-slate-500 mt-1 flex items-center gap-1"><Factory className="w-3 h-3"/> {m.industry}</div>
+                        </td>
+                        <td className="p-6">
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${
+                            m.level.includes('铂金') || m.level.includes('发起') 
+                              ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
+                              : 'bg-slate-100 text-slate-600 border-slate-200'
+                          }`}>
+                            {m.level}
+                          </span>
+                        </td>
+                        <td className="p-6 text-slate-600 hidden md:table-cell font-medium">
+                           <div className="flex items-center gap-2">
+                              {m.industry.includes('制造') || m.industry.includes('能源') ? <Factory className="w-4 h-4 opacity-40"/> : <Building2 className="w-4 h-4 opacity-40"/>}
+                              {m.industry}
+                           </div>
+                        </td>
+                        <td className="p-6 text-slate-600 hidden md:table-cell">
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 opacity-40" />
+                            {m.location}
+                          </div>
+                        </td>
+                        <td className="p-6 pr-8 text-right font-mono font-bold text-slate-900 text-lg group-hover:text-emerald-600">{m.targetYear}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="p-12 text-center text-slate-400">
+                        <div className="flex flex-col items-center gap-2">
+                           <Filter className="w-8 h-8 opacity-20" />
+                           <span>未找到匹配的成员单位</span>
                         </div>
                       </td>
-                      <td className="p-6 pr-8 text-right font-mono font-bold text-slate-900 text-lg group-hover:text-emerald-600">{m.targetYear}</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
