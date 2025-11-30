@@ -67,22 +67,28 @@ const App: React.FC = () => {
         <Section id="home" className="bg-black" backgroundImage="https://images.unsplash.com/photo-1466611653911-95081537e5b7?q=80&w=2070&auto=format&fit=crop">
            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/70 z-0"></div>
            
-           <div className="relative z-10 max-w-6xl mx-auto text-center space-y-6 md:space-y-8 text-white px-4">
-            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] md:text-xs font-semibold tracking-[0.2em] uppercase mb-2 md:mb-4">
+           <div className="relative z-10 max-w-6xl mx-auto text-center space-y-4 md:space-y-8 text-white px-4">
+            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] md:text-xs font-semibold tracking-[0.2em] uppercase mb-1 md:mb-4">
               Green Electricity 100%
             </div>
-            <h1 className="text-4xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-none text-white drop-shadow-xl">
+            <h1 className="text-3xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-none text-white drop-shadow-xl">
               绿电百分百<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">行动倡议 (GE1OO)</span>
             </h1>
-            <p className="text-sm md:text-xl text-slate-100 leading-relaxed max-w-3xl mx-auto font-light tracking-wide opacity-90 line-clamp-3 md:line-clamp-none">
+            <p className="text-xs md:text-xl text-slate-100 leading-relaxed max-w-3xl mx-auto font-light tracking-wide opacity-90 line-clamp-4 md:line-clamp-none">
               GE1OO行动倡议于2023年6月发起，作为国内首个聚焦绿电消费的行动倡议，旨在推动可再生能源的广泛利用，助力中国碳中和目标。目前已得到近百家知名企业和权威机构的支持。
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 pt-6 md:pt-10">
-              <Button size="lg" className="bg-white text-emerald-900 hover:bg-emerald-50 border-0 w-full sm:w-auto" onClick={() => document.getElementById('join')?.scrollIntoView({behavior: 'smooth'})}>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-6 pt-4 md:pt-10">
+              <Button 
+                className="bg-white text-emerald-900 hover:bg-emerald-50 border-0 w-full sm:w-auto px-6 py-2.5 text-sm md:px-8 md:py-3.5 md:text-lg" 
+                onClick={() => document.getElementById('join')?.scrollIntoView({behavior: 'smooth'})}
+              >
                 加入我们
               </Button>
-              <Button size="lg" className="bg-black/30 backdrop-blur-md border border-white/30 text-white hover:bg-white/10 w-full sm:w-auto" onClick={() => document.getElementById('about')?.scrollIntoView({behavior: 'smooth'})}>
+              <Button 
+                className="bg-black/30 backdrop-blur-md border border-white/30 text-white hover:bg-white/10 w-full sm:w-auto px-6 py-2.5 text-sm md:px-8 md:py-3.5 md:text-lg" 
+                onClick={() => document.getElementById('about')?.scrollIntoView({behavior: 'smooth'})}
+              >
                 了解更多
               </Button>
             </div>
@@ -566,7 +572,8 @@ const App: React.FC = () => {
         {/* --- Screen 8: Contact Form --- */}
         <Section id="join-form" className="bg-slate-50 bg-pattern-grid">
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-12 max-w-7xl mx-auto w-full items-center h-full md:h-auto">
-              <div className="lg:col-span-5 space-y-4 md:space-y-8 order-2 lg:order-1">
+              {/* Swapped order on mobile: Text first (order-1), Form second (order-2) */}
+              <div className="lg:col-span-5 space-y-4 md:space-y-8 order-1 lg:order-1">
                  <h2 className="text-2xl md:text-4xl font-bold">
                    申请加入<br/><GradientText>GE100 倡议</GradientText>
                  </h2>
@@ -585,7 +592,7 @@ const App: React.FC = () => {
                  </div>
               </div>
 
-              <div className="lg:col-span-7 bg-white p-5 md:p-12 rounded-[2rem] md:rounded-[2.5rem] shadow-xl border border-slate-100 relative overflow-hidden order-1 lg:order-2">
+              <div className="lg:col-span-7 bg-white p-5 md:p-12 rounded-[2rem] md:rounded-[2.5rem] shadow-xl border border-slate-100 relative overflow-hidden order-2 lg:order-2">
                  <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-emerald-50 rounded-bl-full -mr-16 -mt-16"></div>
                  <form className="space-y-3 md:space-y-5 relative z-10" onSubmit={(e) => e.preventDefault()}>
                     <div className="grid grid-cols-2 gap-3 md:gap-5">
@@ -674,8 +681,8 @@ const App: React.FC = () => {
         <Section id="resources-events" className="bg-slate-50 bg-pattern-grid">
            <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
               
-              {/* Left Column: Event Preview */}
-              <div className="space-y-4 md:space-y-8 lg:pr-8 order-2 lg:order-1">
+              {/* Left Column: Event Preview - Swapped order: Text first (order-1), Form second (order-2) on mobile */}
+              <div className="space-y-4 md:space-y-8 lg:pr-8 order-1 lg:order-1">
                  <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-emerald-600/20">
                     <Calendar className="w-5 h-5 md:w-6 md:h-6" />
                  </div>
@@ -700,7 +707,7 @@ const App: React.FC = () => {
               </div>
 
               {/* Right Column: Submission Form */}
-              <div className="bg-white p-5 md:p-10 rounded-xl shadow-xl border border-slate-100 order-1 lg:order-2">
+              <div className="bg-white p-5 md:p-10 rounded-xl shadow-xl border border-slate-100 order-2 lg:order-2">
                  <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-4 md:mb-8">案例申报通道</h3>
                  
                  <form className="space-y-4 md:space-y-6" onSubmit={(e) => e.preventDefault()}>
